@@ -1,7 +1,8 @@
 import os
 import xml.etree.ElementTree as ET
 
-def load(data_path_list):
+
+def load(data_path_list, size_lim=None):
 
     all_imgs = []
 
@@ -9,15 +10,14 @@ def load(data_path_list):
 
     class_mapping = {}
 
-    visualise = False
+    trainval_files = []
+    test_files = []
+
     for data_path in data_path_list:
         annotaion_path = os.path.join(data_path, 'Annotations')
         imgs_path = os.path.join(data_path, 'JPEGImages')
         imgsets_path_train = os.path.join(data_path, 'ImageSets', 'Main', 'trainval.txt')
         imgsets_path_test = os.path.join(data_path, 'ImageSets', 'Main', 'test.txt')
-
-        trainval_files = []
-        test_files = []
 
         try:
             with open(imgsets_path_train) as f:
@@ -76,6 +76,9 @@ def load(data_path_list):
                     annotation_data['bboxes'].append(
                         {'class': class_name, 'x1': x1, 'x2': x2, 'y1': y1, 'y2': y2, 'difficult': difficulty})
                     all_imgs.append(annotation_data)
+                    if size_lim is not None:
+                        if len(all_imgs)>size_lim:
+                            break
             except Exception as e:
                 print(e)
 
