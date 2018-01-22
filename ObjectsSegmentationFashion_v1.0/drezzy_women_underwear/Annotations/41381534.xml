@@ -1,0 +1,39 @@
+<annotation>
+	<folder>VOC2010</folder>
+	<filename>41381534.jpg</filename>
+	<source>
+		<database>DICOM VOC2010 compatible Annotation Database</database>
+		<annotation>Department of Computer Science and Communication</annotation>
+		<image>University of Insubria</image>
+	</source>
+	<size>
+		<width>100</width>
+		<height>100</height>
+		<depth>3</depth>
+	</size>
+	<segmented>1</segmented>
+	<object>
+		<name>reggiseno</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmax>75</xmax>
+			<xmin>30</xmin>
+			<ymax>39</ymax>
+			<ymin>4</ymin>
+		</bndbox>
+	</object>
+	<object>
+		<name>mutande</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmax>81</xmax>
+			<xmin>26</xmin>
+			<ymax>97</ymax>
+			<ymin>69</ymin>
+		</bndbox>
+	</object>
+</annotation>

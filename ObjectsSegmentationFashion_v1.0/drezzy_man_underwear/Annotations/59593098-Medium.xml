@@ -1,0 +1,27 @@
+<annotation>
+	<folder>VOC2010</folder>
+	<filename>59593098-Medium.jpg</filename>
+	<source>
+		<database>DICOM VOC2010 compatible Annotation Database</database>
+		<annotation>Department of Computer Science and Communication</annotation>
+		<image>University of Insubria</image>
+	</source>
+	<size>
+		<width>200</width>
+		<height>200</height>
+		<depth>3</depth>
+	</size>
+	<segmented>1</segmented>
+	<object>
+		<name>mutande</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmax>161</xmax>
+			<xmin>52</xmin>
+			<ymax>140</ymax>
+			<ymin>73</ymin>
+		</bndbox>
+	</object>
+</annotation>

@@ -1,0 +1,39 @@
+<annotation>
+	<folder>VOC2010</folder>
+	<filename>43341160.jpg</filename>
+	<source>
+		<database>DICOM VOC2010 compatible Annotation Database</database>
+		<annotation>Department of Computer Science and Communication</annotation>
+		<image>University of Insubria</image>
+	</source>
+	<size>
+		<width>200</width>
+		<height>200</height>
+		<depth>3</depth>
+	</size>
+	<segmented>1</segmented>
+	<object>
+		<name>shoe</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmax>126</xmax>
+			<xmin>107</xmin>
+			<ymax>191</ymax>
+			<ymin>123</ymin>
+		</bndbox>
+	</object>
+	<object>
+		<name>shoe</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmax>110</xmax>
+			<xmin>94</xmin>
+			<ymax>180</ymax>
+			<ymin>120</ymin>
+		</bndbox>
+	</object>
+</annotation>

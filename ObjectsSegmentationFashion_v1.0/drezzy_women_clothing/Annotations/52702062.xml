@@ -1,0 +1,27 @@
+<annotation>
+	<folder>VOC2010</folder>
+	<filename>52702062.jpg</filename>
+	<source>
+		<database>DICOM VOC2010 compatible Annotation Database</database>
+		<annotation>Department of Computer Science and Communication</annotation>
+		<image>University of Insubria</image>
+	</source>
+	<size>
+		<width>100</width>
+		<height>100</height>
+		<depth>3</depth>
+	</size>
+	<segmented>1</segmented>
+	<object>
+		<name>fuseaux</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmax>67</xmax>
+			<xmin>37</xmin>
+			<ymax>60</ymax>
+			<ymin>4</ymin>
+		</bndbox>
+	</object>
+</annotation>

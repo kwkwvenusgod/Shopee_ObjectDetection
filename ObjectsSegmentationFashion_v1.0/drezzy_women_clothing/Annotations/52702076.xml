@@ -1,0 +1,51 @@
+<annotation>
+	<folder>VOC2010</folder>
+	<filename>52702076.jpg</filename>
+	<source>
+		<database>DICOM VOC2010 compatible Annotation Database</database>
+		<annotation>Department of Computer Science and Communication</annotation>
+		<image>University of Insubria</image>
+	</source>
+	<size>
+		<width>100</width>
+		<height>100</height>
+		<depth>3</depth>
+	</size>
+	<segmented>1</segmented>
+	<object>
+		<name>canottiera</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmax>58</xmax>
+			<xmin>39</xmin>
+			<ymax>48</ymax>
+			<ymin>16</ymin>
+		</bndbox>
+	</object>
+	<object>
+		<name>pantaloni</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmax>58</xmax>
+			<xmin>38</xmin>
+			<ymax>94</ymax>
+			<ymin>48</ymin>
+		</bndbox>
+	</object>
+	<object>
+		<name>giacca</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmax>68</xmax>
+			<xmin>51</xmin>
+			<ymax>99</ymax>
+			<ymin>51</ymin>
+		</bndbox>
+	</object>
+</annotation>

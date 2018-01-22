@@ -1,0 +1,63 @@
+<annotation>
+	<folder>VOC2010</folder>
+	<filename>63745117.jpg</filename>
+	<source>
+		<database>DICOM VOC2010 compatible Annotation Database</database>
+		<annotation>Department of Computer Science and Communication</annotation>
+		<image>University of Insubria</image>
+	</source>
+	<size>
+		<width>200</width>
+		<height>200</height>
+		<depth>3</depth>
+	</size>
+	<segmented>1</segmented>
+	<object>
+		<name>hat</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmax>80</xmax>
+			<xmin>31</xmin>
+			<ymax>48</ymax>
+			<ymin>18</ymin>
+		</bndbox>
+	</object>
+	<object>
+		<name>hat</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmax>107</xmax>
+			<xmin>76</xmin>
+			<ymax>65</ymax>
+			<ymin>37</ymin>
+		</bndbox>
+	</object>
+	<object>
+		<name>hat</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmax>92</xmax>
+			<xmin>2</xmin>
+			<ymax>182</ymax>
+			<ymin>102</ymin>
+		</bndbox>
+	</object>
+	<object>
+		<name>hat</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmax>198</xmax>
+			<xmin>107</xmin>
+			<ymax>176</ymax>
+			<ymin>102</ymin>
+		</bndbox>
+	</object>
+</annotation>

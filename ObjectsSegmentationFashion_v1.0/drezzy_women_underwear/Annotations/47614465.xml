@@ -1,0 +1,51 @@
+<annotation>
+	<folder>VOC2010</folder>
+	<filename>47614465.jpg</filename>
+	<source>
+		<database>DICOM VOC2010 compatible Annotation Database</database>
+		<annotation>Department of Computer Science and Communication</annotation>
+		<image>University of Insubria</image>
+	</source>
+	<size>
+		<width>100</width>
+		<height>100</height>
+		<depth>3</depth>
+	</size>
+	<segmented>1</segmented>
+	<object>
+		<name>abbigliamento</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmax>13</xmax>
+			<xmin>0</xmin>
+			<ymax>73</ymax>
+			<ymin>0</ymin>
+		</bndbox>
+	</object>
+	<object>
+		<name>abbigliamento</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmax>100</xmax>
+			<xmin>77</xmin>
+			<ymax>61</ymax>
+			<ymin>0</ymin>
+		</bndbox>
+	</object>
+	<object>
+		<name>mutande</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmax>88</xmax>
+			<xmin>7</xmin>
+			<ymax>81</ymax>
+			<ymin>17</ymin>
+		</bndbox>
+	</object>
+</annotation>

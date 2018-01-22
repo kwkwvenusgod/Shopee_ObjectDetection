@@ -1,0 +1,27 @@
+<annotation>
+	<folder>VOC2010</folder>
+	<filename>52908739.jpg</filename>
+	<source>
+		<database>DICOM VOC2010 compatible Annotation Database</database>
+		<annotation>Department of Computer Science and Communication</annotation>
+		<image>University of Insubria</image>
+	</source>
+	<size>
+		<width>100</width>
+		<height>100</height>
+		<depth>3</depth>
+	</size>
+	<segmented>1</segmented>
+	<object>
+		<name>felpa</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmax>73</xmax>
+			<xmin>16</xmin>
+			<ymax>93</ymax>
+			<ymin>26</ymin>
+		</bndbox>
+	</object>
+</annotation>
