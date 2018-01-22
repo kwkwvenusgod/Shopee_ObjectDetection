@@ -9,15 +9,15 @@ def load(data_path_list):
 
     class_mapping = {}
 
+    trainval_files = []
+    test_files = []
+
     visualise = False
     for data_path in data_path_list:
         annotaion_path = os.path.join(data_path, 'Annotations')
         imgs_path = os.path.join(data_path, 'JPEGImages')
         imgsets_path_train = os.path.join(data_path, 'ImageSets', 'Main', 'trainval.txt')
         imgsets_path_test = os.path.join(data_path, 'ImageSets', 'Main', 'test.txt')
-
-        trainval_files = []
-        test_files = []
 
         try:
             with open(imgsets_path_train) as f:
