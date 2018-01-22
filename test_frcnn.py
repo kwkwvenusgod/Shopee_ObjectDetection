@@ -248,7 +248,7 @@ for idx, img_name in enumerate(sorted(os.listdir(img_path))):
 
     print('Elapsed time = {}'.format(time.time() - st))
     print(all_dets)
-    cv2.imshow('img', img)
+    # cv2.imshow('img', img)
     output_file = 'output/' + str(idx) + '.jpg'
     cv2.imwrite(output_file, img)
     cv2.waitKey(0)
