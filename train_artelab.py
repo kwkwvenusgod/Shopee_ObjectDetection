@@ -1,6 +1,6 @@
 from __future__ import division
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 import random
 import pprint
 import time
@@ -93,13 +93,10 @@ model_classifier = Model([img_input, roi_input], classifier)
 # this is a model that holds both the RPN and the classifier, used to load/save weights for the models
 model_all = Model([img_input, roi_input], rpn[:2] + classifier)
 
-try:
-    print('loading weights from {}'.format(frcnn_config.base_net_weights))
-    model_rpn.load_weights(frcnn_config.base_net_weights, by_name=True)
-    model_classifier.load_weights(frcnn_config.base_net_weights, by_name=True)
-except:
-    print('Could not load pretrained model weights. Weights can be found in the keras application folder \
-		https://github.com/fchollet/keras/tree/master/keras/applications')
+base_net_weight_path = 'pretrain/resnet50_weights_tf_dim_ordering_tf_kernels.h5'
+model_rpn.load_weights(filepath=base_net_weight_path, by_name=True)
+model_classifier.load_weights(filepath=base_net_weight_path, by_name=True)
+
 
 optimizer = Adam(lr=1e-5)
 optimizer_classifier = Adam(lr=1e-5)
