@@ -1,6 +1,6 @@
 from __future__ import division
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 import random
 import pprint
 import time
@@ -242,7 +242,8 @@ for epoch_num in range(num_epochs):
                     if frcnn_config.verbose:
                         print('Total loss decreased from {} to {}, saving weights'.format(best_loss, curr_loss))
                     best_loss = curr_loss
-                    model_all.save_weights(frcnn_config.model_path)
+                    model_path = 'model_output/'+frcnn_config.model_path
+                    model_all.save_weights(model_path)
 
                 break
 
