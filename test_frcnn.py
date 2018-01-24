@@ -135,9 +135,10 @@ model_classifier_only = Model([feature_map_input, roi_input], classifier)
 
 model_classifier = Model([feature_map_input, roi_input], classifier)
 
-print('Loading weights from {}'.format(C.model_path))
-model_rpn.load_weights(C.model_path, by_name=True)
-model_classifier.load_weights(C.model_path, by_name=True)
+model_path =  'model_output/' + C.model_path
+print('Loading weights from {}'.format(model_path ))
+model_rpn.load_weights(model_path, by_name=True)
+model_classifier.load_weights(model_path, by_name=True)
 
 model_rpn.compile(optimizer='sgd', loss='mse')
 model_classifier.compile(optimizer='sgd', loss='mse')
@@ -249,7 +250,7 @@ for idx, img_name in enumerate(sorted(os.listdir(img_path))):
     print('Elapsed time = {}'.format(time.time() - st))
     print(all_dets)
     # cv2.imshow('img', img)
-    output_file = 'output/' + str(idx) + '.jpg'
+    output_file = './output/' + str(idx) + '.jpg'
     cv2.imwrite(output_file, img)
-    cv2.waitKey(0)
-# cv2.imwrite('./results_imgs/{}.png'.format(idx),img)
+    # cv2.waitKey(0)
+    # cv2.imwrite('./results_imgs/{}.png'.format(idx),img)
