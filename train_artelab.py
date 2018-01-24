@@ -1,6 +1,6 @@
 from __future__ import division
 import os
-# os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 import random
 import pprint
 import time
@@ -16,6 +16,7 @@ from keras_frcnn import config, data_generators
 from keras_frcnn import losses as losses
 import keras_frcnn.roi_helpers as roi_helpers
 from keras.utils import generic_utils
+from pathlib import Path
 
 train_path_list = ['ObjectsSegmentationFashion_v1.0/drezzy_women_clothing', 'ObjectsSegmentationFashion_v1.0/drezzy_women_underwear']
 # pass the settings from the command line, and persist them in the config object
@@ -93,10 +94,20 @@ model_classifier = Model([img_input, roi_input], classifier)
 # this is a model that holds both the RPN and the classifier, used to load/save weights for the models
 model_all = Model([img_input, roi_input], rpn[:2] + classifier)
 
-base_net_weight_path = 'pretrain/resnet50_weights_tf_dim_ordering_tf_kernels.h5'
-model_rpn.load_weights(filepath=base_net_weight_path, by_name=True)
-model_classifier.load_weights(filepath=base_net_weight_path, by_name=True)
+model_path = 'model_output/'+frcnn_config.model_path
+pretrain_model_path = 'pretrain/resnet50_weights_tf_dim_ordering_tf_kernels.h5'
 
+try:
+    if Path(model_path).exists() is True:
+        model_rpn.load_weights(filepath=model_path, by_name=True)
+        model_classifier.load_weights(filepath=model_path, by_name=True)
+        print("Succesfully load model parameters")
+    elif Path(pretrain_model_path).exists() is True:
+        model_rpn.load_weights(filepath=pretrain_model_path, by_name=True)
+        model_classifier.load_weights(filepath=pretrain_model_path, by_name=True)
+        print("Succesfully load pretrained standard keras model parameters")
+except:
+    print("No pre trained model")
 
 optimizer = Adam(lr=1e-5)
 optimizer_classifier = Adam(lr=1e-5)
@@ -242,7 +253,7 @@ for epoch_num in range(num_epochs):
                     if frcnn_config.verbose:
                         print('Total loss decreased from {} to {}, saving weights'.format(best_loss, curr_loss))
                     best_loss = curr_loss
-                    model_path = 'model_output/'+frcnn_config.model_path
+
                     model_all.save_weights(model_path)
 
                 break
