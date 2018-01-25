@@ -1,6 +1,7 @@
 import os
 import xml.etree.ElementTree as ET
 
+
 def load(data_path_list):
 
     all_imgs = []
@@ -12,7 +13,6 @@ def load(data_path_list):
     trainval_files = []
     test_files = []
 
-    visualise = False
     for data_path in data_path_list:
         annotaion_path = os.path.join(data_path, 'Annotations')
         imgs_path = os.path.join(data_path, 'JPEGImages')

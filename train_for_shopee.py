@@ -6,7 +6,8 @@ import pprint
 import time
 import numpy as np
 import pickle
-import load_artelab_data
+import simplejson
+import load_data
 
 from keras import backend as K
 from keras.optimizers import Adam
@@ -33,8 +34,11 @@ else:
     raise ValueError
 
 # check if weight path was passed via command line
+# read training data config
+with open('train_dataset_config.json', 'rb') as dataset_config_file:
+    dataset_config = simplejson.load(dataset_config_file)
 
-all_imgs, classes_count, class_mapping = load_artelab_data.load(train_path_list)
+all_imgs, classes_count, class_mapping = load_data.load(dataset_config)
 
 if 'bg' not in classes_count:
     classes_count['bg'] = 0
