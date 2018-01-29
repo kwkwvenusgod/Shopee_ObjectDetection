@@ -136,7 +136,7 @@ class_mapping_inv = {v: k for k, v in class_mapping.items()}
 print('Starting training')
 
 vis = True
-
+batch_size = 1000
 for epoch_num in range(num_epochs):
 
     progbar = generic_utils.Progbar(epoch_length)
@@ -154,113 +154,120 @@ for epoch_num in range(num_epochs):
                     print(
                         'RPN is not producing bounding boxes that overlap the ground truth boxes. Check RPN settings or keep training.')
 
-            X, Y, img_data = next(data_gen_train)
+            # X, Y, img_data = next(data_gen_train)
+            X_batch, Y_batch, img_data_batch = load_data.get_n_batch(batch_size, data_gen_train)
 
-            loss_rpn = model_rpn.train_on_batch(X, Y)
+            loss_rpn = model_rpn.train_on_batch(X_batch, Y_batch)
 
-            P_rpn = model_rpn.predict_on_batch(X)
+            for i in range(batch_size):
+                X = X_batch[i]
+                img_data = img_data_batch[i]
 
-            R = roi_helpers.rpn_to_roi(P_rpn[0], P_rpn[1], frcnn_config, K.image_dim_ordering(), use_regr=True,
-                                       overlap_thresh=0.7,
-                                       max_boxes=300)
-            # note: calc_iou converts from (x1,y1,x2,y2) to (x,y,w,h) format
-            X2, Y1, Y2, IouS = roi_helpers.calc_iou(R, img_data, frcnn_config, class_mapping)
+                P_rpn = model_rpn.predict_on_batch(X)
 
-            if X2 is None:
-                rpn_accuracy_rpn_monitor.append(0)
-                rpn_accuracy_for_epoch.append(0)
-                continue
+                R = roi_helpers.rpn_to_roi(P_rpn[0], P_rpn[1], frcnn_config, K.image_dim_ordering(), use_regr=True,
+                                           overlap_thresh=0.7,
+                                           max_boxes=300)
+                # note: calc_iou converts from (x1,y1,x2,y2) to (x,y,w,h) format
+                X2, Y1, Y2, IouS = roi_helpers.calc_iou(R, img_data, frcnn_config, class_mapping)
 
-            neg_samples = np.where(Y1[0, :, -1] == 1)
-            pos_samples = np.where(Y1[0, :, -1] == 0)
+                if X2 is None:
+                    rpn_accuracy_rpn_monitor.append(0)
+                    rpn_accuracy_for_epoch.append(0)
+                    continue
 
-            if len(neg_samples) > 0:
-                neg_samples = neg_samples[0]
-            else:
-                neg_samples = []
+                neg_samples = np.where(Y1[0, :, -1] == 1)
+                pos_samples = np.where(Y1[0, :, -1] == 0)
 
-            if len(pos_samples) > 0:
-                pos_samples = pos_samples[0]
-            else:
-                pos_samples = []
+                if len(neg_samples) > 0:
+                    neg_samples = neg_samples[0]
+                else:
+                    neg_samples = []
 
-            rpn_accuracy_rpn_monitor.append(len(pos_samples))
-            rpn_accuracy_for_epoch.append((len(pos_samples)))
+                if len(pos_samples) > 0:
+                    pos_samples = pos_samples[0]
+                else:
+                    pos_samples = []
 
-            if frcnn_config.num_rois > 1:
-                if len(pos_samples) < frcnn_config.num_rois // 2:
+                rpn_accuracy_rpn_monitor.append(len(pos_samples))
+                rpn_accuracy_for_epoch.append((len(pos_samples)))
+
+                if frcnn_config.num_rois > 1:
+                    if len(pos_samples) < frcnn_config.num_rois // 2:
+                        selected_pos_samples = pos_samples.tolist()
+                    else:
+                        selected_pos_samples = np.random.choice(pos_samples, frcnn_config.num_rois // 2,
+                                                                replace=False).tolist()
+                    try:
+                        selected_neg_samples = np.random.choice(neg_samples,
+                                                                frcnn_config.num_rois - len(selected_pos_samples),
+                                                                replace=False).tolist()
+                    except:
+                        selected_neg_samples = np.random.choice(neg_samples,
+                                                                frcnn_config.num_rois - len(selected_pos_samples),
+                                                                replace=True).tolist()
+
+                    sel_samples = selected_pos_samples + selected_neg_samples
+                else:
+                    # in the extreme case where num_rois = 1, we pick a random pos or neg sample
                     selected_pos_samples = pos_samples.tolist()
-                else:
-                    selected_pos_samples = np.random.choice(pos_samples, frcnn_config.num_rois // 2,
-                                                            replace=False).tolist()
-                try:
-                    selected_neg_samples = np.random.choice(neg_samples,
-                                                            frcnn_config.num_rois - len(selected_pos_samples),
-                                                            replace=False).tolist()
-                except:
-                    selected_neg_samples = np.random.choice(neg_samples,
-                                                            frcnn_config.num_rois - len(selected_pos_samples),
-                                                            replace=True).tolist()
+                    selected_neg_samples = neg_samples.tolist()
+                    if np.random.randint(0, 2):
+                        sel_samples = random.choice(neg_samples)
+                    else:
+                        sel_samples = random.choice(pos_samples)
 
-                sel_samples = selected_pos_samples + selected_neg_samples
-            else:
-                # in the extreme case where num_rois = 1, we pick a random pos or neg sample
-                selected_pos_samples = pos_samples.tolist()
-                selected_neg_samples = neg_samples.tolist()
-                if np.random.randint(0, 2):
-                    sel_samples = random.choice(neg_samples)
-                else:
-                    sel_samples = random.choice(pos_samples)
+                loss_class = model_classifier.train_on_batch([X, X2[:, sel_samples, :]],
+                                                             [Y1[:, sel_samples, :], Y2[:, sel_samples, :]])
 
-            loss_class = model_classifier.train_on_batch([X, X2[:, sel_samples, :]],
-                                                         [Y1[:, sel_samples, :], Y2[:, sel_samples, :]])
+                losses[iter_num, 0] = loss_rpn[1]
+                losses[iter_num, 1] = loss_rpn[2]
 
-            losses[iter_num, 0] = loss_rpn[1]
-            losses[iter_num, 1] = loss_rpn[2]
+                losses[iter_num, 2] = loss_class[1]
+                losses[iter_num, 3] = loss_class[2]
+                losses[iter_num, 4] = loss_class[3]
 
-            losses[iter_num, 2] = loss_class[1]
-            losses[iter_num, 3] = loss_class[2]
-            losses[iter_num, 4] = loss_class[3]
+                iter_num += 1
 
-            iter_num += 1
+                progbar.update(iter_num,
+                               [('rpn_cls', np.mean(losses[:iter_num, 0])), ('rpn_regr', np.mean(losses[:iter_num, 1])),
+                                ('detector_cls', np.mean(losses[:iter_num, 2])),
+                                ('detector_regr', np.mean(losses[:iter_num, 3]))])
 
-            progbar.update(iter_num,
-                           [('rpn_cls', np.mean(losses[:iter_num, 0])), ('rpn_regr', np.mean(losses[:iter_num, 1])),
-                            ('detector_cls', np.mean(losses[:iter_num, 2])),
-                            ('detector_regr', np.mean(losses[:iter_num, 3]))])
+                if iter_num == epoch_length:
+                    loss_rpn_cls = np.mean(losses[:, 0])
+                    loss_rpn_regr = np.mean(losses[:, 1])
+                    loss_class_cls = np.mean(losses[:, 2])
+                    loss_class_regr = np.mean(losses[:, 3])
+                    class_acc = np.mean(losses[:, 4])
 
-            if iter_num == epoch_length:
-                loss_rpn_cls = np.mean(losses[:, 0])
-                loss_rpn_regr = np.mean(losses[:, 1])
-                loss_class_cls = np.mean(losses[:, 2])
-                loss_class_regr = np.mean(losses[:, 3])
-                class_acc = np.mean(losses[:, 4])
+                    mean_overlapping_bboxes = float(sum(rpn_accuracy_for_epoch)) / len(rpn_accuracy_for_epoch)
+                    rpn_accuracy_for_epoch = []
 
-                mean_overlapping_bboxes = float(sum(rpn_accuracy_for_epoch)) / len(rpn_accuracy_for_epoch)
-                rpn_accuracy_for_epoch = []
-
-                if frcnn_config.verbose:
-                    print('Mean number of bounding boxes from RPN overlapping ground truth boxes: {}'.format(
-                        mean_overlapping_bboxes))
-                    print('Classifier accuracy for bounding boxes from RPN: {}'.format(class_acc))
-                    print('Loss RPN classifier: {}'.format(loss_rpn_cls))
-                    print('Loss RPN regression: {}'.format(loss_rpn_regr))
-                    print('Loss Detector classifier: {}'.format(loss_class_cls))
-                    print('Loss Detector regression: {}'.format(loss_class_regr))
-                    print('Elapsed time: {}'.format(time.time() - start_time))
-
-                curr_loss = loss_rpn_cls + loss_rpn_regr + loss_class_cls + loss_class_regr
-                iter_num = 0
-                start_time = time.time()
-
-                if curr_loss < best_loss:
                     if frcnn_config.verbose:
-                        print('Total loss decreased from {} to {}, saving weights'.format(best_loss, curr_loss))
-                    best_loss = curr_loss
+                        print('Mean number of bounding boxes from RPN overlapping ground truth boxes: {}'.format(
+                            mean_overlapping_bboxes))
+                        print('Classifier accuracy for bounding boxes from RPN: {}'.format(class_acc))
+                        print('Loss RPN classifier: {}'.format(loss_rpn_cls))
+                        print('Loss RPN regression: {}'.format(loss_rpn_regr))
+                        print('Loss Detector classifier: {}'.format(loss_class_cls))
+                        print('Loss Detector regression: {}'.format(loss_class_regr))
+                        print('Elapsed time: {}'.format(time.time() - start_time))
 
-                    model_all.save_weights(model_path)
+                    curr_loss = loss_rpn_cls + loss_rpn_regr + loss_class_cls + loss_class_regr
+                    iter_num = 0
+                    start_time = time.time()
 
-                break
+                    if curr_loss < best_loss:
+                        if frcnn_config.verbose:
+                            print('Total loss decreased from {} to {}, saving weights'.format(best_loss, curr_loss))
+                        best_loss = curr_loss
+
+                        model_all.save_weights(model_path)
+
+                    break
+
+
 
         except Exception as e:
             print('Exception: {}'.format(e))
