@@ -6,11 +6,12 @@ import sys
 import pickle
 from optparse import OptionParser
 import time
-from keras_frcnn import config
+from pathlib import Path
 from keras import backend as K
 from keras.layers import Input
 from keras.models import Model
 from keras_frcnn import roi_helpers
+from download_model import download_model_from_google_drive
 
 sys.setrecursionlimit(40000)
 
@@ -135,7 +136,15 @@ model_classifier_only = Model([feature_map_input, roi_input], classifier)
 
 model_classifier = Model([feature_map_input, roi_input], classifier)
 
-model_path =  'model_output/' + C.model_path
+model_path='model_output/' + C.model_path
+try:
+    if Path(model_path).exists() is False:
+        download_model_from_google_drive(model_path=model_path)
+except:
+    print ("error happened when getting trained model. Please download the model from https://drive.google.com/open?id=1o9d3eGp0z_brNnHO9_XNyRNsJMShHRTa."
+           "Contact kwkwvenusgod@gmail.com if there is still error with getting model")
+
+
 print('Loading weights from {}'.format(model_path ))
 model_rpn.load_weights(model_path, by_name=True)
 model_classifier.load_weights(model_path, by_name=True)
