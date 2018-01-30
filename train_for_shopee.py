@@ -1,6 +1,6 @@
 from __future__ import division
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "4"
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 import random
 import pprint
 import time
