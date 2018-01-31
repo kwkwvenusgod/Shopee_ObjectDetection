@@ -19,7 +19,6 @@ import keras_frcnn.roi_helpers as roi_helpers
 from keras.utils import generic_utils
 from pathlib import Path
 
-train_path_list = ['ObjectsSegmentationFashion_v1.0/drezzy_women_clothing', 'ObjectsSegmentationFashion_v1.0/drezzy_women_underwear']
 # pass the settings from the command line, and persist them in the config object
 frcnn_config = config.Config()
 

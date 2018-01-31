@@ -2,7 +2,7 @@ import os
 import xml.etree.ElementTree as ET
 
 
-def load(data_path_list):
+def load(data_path_list, size_lim=None):
 
     all_imgs = []
 
@@ -76,6 +76,9 @@ def load(data_path_list):
                     annotation_data['bboxes'].append(
                         {'class': class_name, 'x1': x1, 'x2': x2, 'y1': y1, 'y2': y2, 'difficult': difficulty})
                     all_imgs.append(annotation_data)
+                    if size_lim is not None:
+                        if len(all_imgs)>size_lim:
+                            break
             except Exception as e:
                 print(e)
 

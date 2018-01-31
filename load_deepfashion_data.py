@@ -2,7 +2,7 @@ import os
 import cv2
 
 
-def load(root_path_list=['deepfashion/consumer-to-shop']):
+def load(root_path_list=['deepfashion/consumer-to-shop'], size_lim=None):
     all_imgs = []
 
     classes_count = {}
@@ -64,6 +64,9 @@ def load(root_path_list=['deepfashion/consumer-to-shop']):
                 class_mapping[bbox_category] = len(class_mapping)
 
             all_imgs.append(annotation_data)
+            if size_lim is not None:
+                if len(all_imgs)>=size_lim:
+                    break
     return all_imgs, classes_count, class_mapping
 
 
