@@ -1,5 +1,7 @@
 from __future__ import division
 import random
+from optparse import OptionParser
+
 import cv2
 import numpy as np
 import sys
@@ -15,8 +17,19 @@ from keras.layers import Input
 from keras.models import Model
 from keras_frcnn import roi_helpers
 from keras_frcnn import data_generators
+from download_model import download_model_from_google_drive
+from optparse import OptionParser
 
 sys.setrecursionlimit(40000)
+
+parser = OptionParser()
+parser.add_option("-d", "--data_source", dest="data_source", help="Validate data for test or train (test/trainval)", default="test")
+(options, args) = parser.parse_args()
+
+if (options.data_source != 'test') | (options.data_source != 'trainval'):
+    print("data source is wrong")
+    SystemExit
+
 with open('train_dataset_config.json', 'rb') as dataset_config_file:
     dataset_config = simplejson.load(dataset_config_file)
 
@@ -41,10 +54,10 @@ else:
 class_mapping = frcnn_config.class_mapping
 
 inv_map = {v: k for k, v in class_mapping.items()}
-val_imgs = [s for s in all_imgs if s['imageset'] == 'test']
+val_imgs = [s for s in all_imgs if s['imageset'] == options.data_source]
 print('Num val samples {}'.format(len(val_imgs)))
 
-data_gen_val = data_generators.get_anchor_gt(val_imgs, classes_count, frcnn_config, nn.get_img_output_length,
+data_gen = data_generators.get_anchor_gt(val_imgs, classes_count, frcnn_config, nn.get_img_output_length,
                                              K.image_dim_ordering(), mode='val')
 
 if K.image_dim_ordering() == 'th':
@@ -62,7 +75,8 @@ shared_layers = nn.nn_base(img_input, trainable=True)
 num_anchors = len(frcnn_config.anchor_box_scales) * len(frcnn_config.anchor_box_ratios)
 rpn = nn.rpn(shared_layers, num_anchors)
 
-classifier = nn.classifier(shared_layers, roi_input, frcnn_config.num_rois, nb_classes=len(class_mapping),
+new_num_rois = frcnn_config.num_rois * 8
+classifier = nn.classifier(shared_layers, roi_input, new_num_rois , nb_classes=len(class_mapping),
                            trainable=True)
 
 model_rpn = Model(img_input, rpn[:2])
@@ -72,18 +86,14 @@ model_classifier = Model([img_input, roi_input], classifier)
 model_all = Model([img_input, roi_input], rpn[:2] + classifier)
 
 model_path = 'model_output/'+frcnn_config.model_path
-pretrain_model_path = 'pretrain/resnet50_weights_tf_dim_ordering_tf_kernels.h5'
 
 try:
     if Path(model_path).exists() is True:
-        model_all.load_weights(filepath=model_path, by_name=True)
         model_rpn.load_weights(filepath=model_path, by_name=True)
         model_classifier.load_weights(filepath=model_path, by_name=True)
         print("Succesfully load model parameters")
-    elif Path(pretrain_model_path).exists() is True:
-        model_rpn.load_weights(filepath=pretrain_model_path, by_name=True)
-        model_classifier.load_weights(filepath=pretrain_model_path, by_name=True)
-        print("Succesfully load pretrained standard keras model parameters")
+    else:
+        download_model_from_google_drive(model_path=model_path)
 except:
     print("No pre trained model")
 
@@ -91,15 +101,15 @@ optimizer = Adam(lr=1e-5)
 optimizer_classifier = Adam(lr=1e-5)
 model_rpn.compile(optimizer=optimizer, loss=[losses.rpn_loss_cls(num_anchors), losses.rpn_loss_regr(num_anchors)])
 model_classifier.compile(optimizer=optimizer_classifier,
-                         loss=[losses.class_loss_cls, losses.class_loss_regr(len(classes_count) - 1)],
-                         metrics={'dense_class_{}'.format(len(classes_count)): 'accuracy'})
+                         loss=[losses.class_loss_cls, losses.class_loss_regr(len(class_mapping) - 1)],
+                         metrics={'dense_class_{}'.format(len(class_mapping)): 'accuracy'})
 model_all.compile(optimizer='sgd', loss='mae')
 
 
 inx = 0
-losses = np.zeros((len(val_imgs), 5))
+loss_metric = np.zeros((len(val_imgs), 5))
 for val_image in val_imgs:
-    X, Y, img_data = next(data_gen_val)
+    X, Y, img_data = next(data_gen)
     res_rpn = model_rpn.evaluate(X, Y, batch_size=1)
 
     pred_rpn = model_rpn.predict(X)
@@ -113,16 +123,53 @@ for val_image in val_imgs:
     if X2 is None:
         continue
 
+    neg_samples = np.where(Y1[0, :, -1] == 1)
+    pos_samples = np.where(Y1[0, :, -1] == 0)
 
-    pred_classifier = model_classifier.predict_on_batch([X, X2])
+    if len(neg_samples) > 0:
+        neg_samples = neg_samples[0]
+    else:
+        neg_samples = []
+
+    if len(pos_samples) > 0:
+        pos_samples = pos_samples[0]
+    else:
+        pos_samples = []
+
+    if frcnn_config.num_rois > 1:
+        if len(pos_samples) < new_num_rois // 2:
+            selected_pos_samples = pos_samples.tolist()
+        else:
+            selected_pos_samples = np.random.choice(pos_samples, new_num_rois // 2,
+                                                    replace=False).tolist()
+        try:
+            selected_neg_samples = np.random.choice(neg_samples,
+                                                    new_num_rois - len(selected_pos_samples),
+                                                    replace=False).tolist()
+        except:
+            selected_neg_samples = np.random.choice(neg_samples,
+                                                    new_num_rois - len(selected_pos_samples),
+                                                    replace=True).tolist()
+
+        sel_samples = selected_pos_samples + selected_neg_samples
+    else:
+        # in the extreme case where num_rois = 1, we pick a random pos or neg sample
+        selected_pos_samples = pos_samples.tolist()
+        selected_neg_samples = neg_samples.tolist()
+        if np.random.randint(0, 2):
+            sel_samples = random.choice(neg_samples)
+        else:
+            sel_samples = random.choice(pos_samples)
+
+    pred_classifier = model_classifier.predict_on_batch([X, X2[:,sel_samples,:]])
     res_classifier = model_classifier.evaluate([X, X2],[Y1, Y2[:, :, 64:]])
 
-    losses[inx, 0] = res_rpn[1]
-    losses[inx, 1] = res_rpn[2]
+    loss_metric[inx, 0] = res_rpn[1]
+    loss_metric[inx, 1] = res_rpn[2]
 
-    losses[inx, 2] = res_classifier[1]
-    losses[inx, 3] = res_classifier[2]
-    losses[inx, 4] = res_classifier[3]
+    loss_metric[inx, 2] = res_classifier[1]
+    loss_metric[inx, 3] = res_classifier[2]
+    loss_metric[inx, 4] = res_classifier[3]
 
     print('Loss RPN classifier: {}'.format(res_rpn[1]))
     print('Loss RPN regression: {}'.format(res_rpn[2]))

@@ -31,7 +31,7 @@ parser.add_option("--network", dest="network", help="Base network to use. Suppor
 if not options.test_path:  # if filename is not given
     parser.error('Error: path to test data must be specified. Pass --path to command line')
 
-config_output_filename = options.config_filename
+config_output_filename = 'model_output/' + options.config_filename
 
 with open(config_output_filename, 'rb') as f_in:
     C = pickle.load(f_in)
