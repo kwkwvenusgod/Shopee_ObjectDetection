@@ -26,7 +26,7 @@ parser = OptionParser()
 parser.add_option("-d", "--data_source", dest="data_source", help="Validate data for test or train (test/trainval)", default="test")
 (options, args) = parser.parse_args()
 
-if (options.data_source != 'test') | (options.data_source != 'trainval'):
+if (options.data_source != 'test') & (options.data_source != 'trainval'):
     print("data source is wrong")
     SystemExit
 
