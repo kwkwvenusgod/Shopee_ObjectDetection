@@ -32,7 +32,7 @@ if (options.data_source != 'test') & (options.data_source != 'trainval'):
 with open('train_dataset_config.json', 'rb') as dataset_config_file:
     dataset_config = simplejson.load(dataset_config_file)
 
-all_imgs, classes_count, class_mapping = load_data.load(dataset_config, size_lim=10000)
+all_imgs, classes_count, class_mapping = load_data.load(dataset_config)
 with open('train_dataset_config.json', 'rb') as dataset_config_file:
     dataset_config = simplejson.load(dataset_config_file)
 
