@@ -1,8 +1,7 @@
 from __future__ import division
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 import random
-from optparse import OptionParser
-
-import cv2
 import numpy as np
 import sys
 import pickle
@@ -161,8 +160,7 @@ for val_image in val_imgs:
         else:
             sel_samples = random.choice(pos_samples)
 
-    pred_classifier = model_classifier.predict_on_batch([X, X2[:,sel_samples,:]])
-    res_classifier = model_classifier.evaluate([X, X2],[Y1, Y2[:, :, 64:]])
+    res_classifier = model_classifier.evaluate([X, X2[:,sel_samples,:]],[Y1[:,sel_samples,:], Y2[:, sel_samples, ]])
 
     loss_metric[inx, 0] = res_rpn[1]
     loss_metric[inx, 1] = res_rpn[2]
