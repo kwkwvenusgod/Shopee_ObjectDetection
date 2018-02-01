@@ -176,9 +176,9 @@ for val_image in val_imgs:
     inx += 1
 
 
-print('Classifier accuracy for bounding boxes from RPN: {}'.format(np.mean(losses[:,4])))
-print('Loss RPN classifier: {}'.format(np.mean(losses[:,0])))
-print('Loss RPN regression: {}'.format(np.mean(losses[:,1])))
-print('Loss Detector classifier: {}'.format(np.mean(losses[:,2])))
-print('Loss Detector regression: {}'.format(np.mean(losses[:,3])))
+print('Classifier accuracy for bounding boxes from RPN: {}'.format(np.mean(loss_metric[:,4])))
+print('Loss RPN classifier: {}'.format(np.mean(loss_metric[:,0])))
+print('Loss RPN regression: {}'.format(np.mean(loss_metric[:,1])))
+print('Loss Detector classifier: {}'.format(np.mean(loss_metric[:,2])))
+print('Loss Detector regression: {}'.format(np.mean(loss_metric[:,3])))
 
