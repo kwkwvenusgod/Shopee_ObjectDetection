@@ -23,5 +23,5 @@ The final model is over 100mb, so github does not allowed to push, so the model 
 
 <embed src="/report/Object-Detection-for-Shopee-Data.pdf" width="750px" height="800px"/>
 
-# Detailed Explanation
+# [Detailed Explanation](https://docs.google.com/presentation/d/11URQZoQFdbCseMgbMKF4ST11NqR6X4QiZEF0YWWWGio/edit#slide=id.g2f3e350bcf_0_43)
 Slides are prepared for the explanation of my solution. It is int the `report` folder. For more details, you may refer the slides instead.
